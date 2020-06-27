@@ -25,6 +25,6 @@ func (l *LineCustomize) join(array []string) string {
 // CompareLines :
 func CompareLines(oldStr, newStr string) []*Change {
 	d := CreateDiff()
-	d.customize = &LineCustomize{}
+	d.Customize = &LineCustomize{}
 	return d.Diff(oldStr, newStr)
 }

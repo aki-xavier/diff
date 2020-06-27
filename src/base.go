@@ -23,7 +23,7 @@ func (c *BaseCustomize) equals(left string, right string) bool {
 
 // Diff :
 type Diff struct {
-	customize       Customize
+	Customize       Customize
 	oldStrings      []string
 	newStrings      []string
 	oldLen          int
@@ -36,7 +36,7 @@ type Diff struct {
 // CreateDiff :
 func CreateDiff() *Diff {
 	d := &Diff{}
-	d.customize = &BaseCustomize{}
+	d.Customize = &BaseCustomize{}
 	d.oldStrings = make([]string, 0)
 	d.newStrings = make([]string, 0)
 	d.oldLen = 0
@@ -49,10 +49,10 @@ func CreateDiff() *Diff {
 
 // Diff :
 func (d *Diff) Diff(oldString, newString string) []*Change {
-	oldString = d.customize.castInput(oldString)
-	newString = d.customize.castInput(newString)
-	d.oldStrings = d.removeEmpty(d.customize.tokenize(oldString))
-	d.newStrings = d.removeEmpty(d.customize.tokenize(newString))
+	oldString = d.Customize.castInput(oldString)
+	newString = d.Customize.castInput(newString)
+	d.oldStrings = d.removeEmpty(d.Customize.tokenize(oldString))
+	d.newStrings = d.removeEmpty(d.Customize.tokenize(newString))
 	d.newLen = len(d.newStrings)
 	d.oldLen = len(d.oldStrings)
 	d.editLength = 1
@@ -64,7 +64,7 @@ func (d *Diff) Diff(oldString, newString string) []*Change {
 	oldPos := d.extractCommon(d.bestPathes[0], d.newStrings, d.oldStrings, 0)
 	if d.bestPathes[0].newPos+1 >= d.newLen && oldPos+1 >= d.oldLen {
 		c := createChange()
-		c.Value = d.customize.join(d.newStrings)
+		c.Value = d.Customize.join(d.newStrings)
 		c.Count = d.newLen
 		ret = append(ret, c)
 		return ret
@@ -120,7 +120,7 @@ func (d *Diff) execEditLength() []*Change {
 			continue
 		}
 
-		if !canAdd || canRemove && addPath.newPos < removePath.newPos {
+		if !canAdd || (canRemove && addPath.newPos < removePath.newPos) {
 			basePath = clonePath(removePath)
 			basePath.pushComponent(false, true)
 		} else {
@@ -151,7 +151,7 @@ func (d *Diff) extractCommon(basePath *Path, newStrings, oldStrings []string, di
 	oldPos := newPos - diagonalPath
 	commonCount := 0
 
-	for newPos+1 < newLen && oldPos+1 < oldLen && d.customize.equals(newStrings[newPos+1], oldStrings[oldPos+1]) {
+	for newPos+1 < newLen && oldPos+1 < oldLen && d.Customize.equals(newStrings[newPos+1], oldStrings[oldPos+1]) {
 		newPos++
 		oldPos++
 		commonCount++
@@ -194,9 +194,9 @@ func buildValues(diff *Diff, components []*Change, newStrings, oldStrings []stri
 						value[i] = oldValue
 					}
 				}
-				component.Value = diff.customize.join(value)
+				component.Value = diff.Customize.join(value)
 			} else {
-				component.Value = diff.customize.join(newStrings[newPos : newPos+component.Count])
+				component.Value = diff.Customize.join(newStrings[newPos : newPos+component.Count])
 			}
 			newPos += component.Count
 
@@ -204,7 +204,7 @@ func buildValues(diff *Diff, components []*Change, newStrings, oldStrings []stri
 				oldPos += component.Count
 			}
 		} else {
-			component.Value = diff.customize.join(oldStrings[oldPos : oldPos+component.Count])
+			component.Value = diff.Customize.join(oldStrings[oldPos : oldPos+component.Count])
 			oldPos += component.Count
 
 			if componentPos != 0 && components[componentPos-1].Added {
@@ -216,7 +216,7 @@ func buildValues(diff *Diff, components []*Change, newStrings, oldStrings []stri
 	}
 
 	lastComponent := components[componentLen-1]
-	if componentLen > 1 && (lastComponent.Added || lastComponent.Removed) && diff.customize.equals("", lastComponent.Value) {
+	if componentLen > 1 && (lastComponent.Added || lastComponent.Removed) && diff.Customize.equals("", lastComponent.Value) {
 		components[componentLen-2].Value += lastComponent.Value
 		components = components[:len(components)-1]
 	}
@@ -231,4 +231,10 @@ func clonePath(path *Path) *Path {
 		p.components = append(p.components, change.clone())
 	}
 	return p
+}
+
+// CompareChars :
+func CompareChars(oldString, newString string) []*Change {
+	d := CreateDiff()
+	return d.Diff(oldString, newString)
 }
