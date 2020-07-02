@@ -1,13 +1,11 @@
 package diff
 
-import "fmt"
-
 // Change :
 type Change struct {
-	Value   string
-	Count   int
-	Added   bool
-	Removed bool
+	Value   string `json:"value"`
+	Count   int    `json:"count"`
+	Added   bool   `json:"added"`
+	Removed bool   `json:"removed"`
 }
 
 func createChange() *Change {
@@ -26,9 +24,4 @@ func (c *Change) clone() *Change {
 	cc.Added = c.Added
 	cc.Removed = c.Removed
 	return cc
-}
-
-// String :
-func (c *Change) String() string {
-	return fmt.Sprintf(`{"value":"%v","count":%v,"added":%v,"removed":%v}`, c.Value, c.Count, c.Added, c.Removed)
 }
