@@ -10,16 +10,18 @@ type LineCustomize struct {
 }
 
 func (l *LineCustomize) tokenize(value string) []string {
-	linesAndNewLines := strings.Split(value, "\n")
-
-	if len(linesAndNewLines) != 0 && linesAndNewLines[len(linesAndNewLines)-1] == "" {
-		linesAndNewLines = linesAndNewLines[:len(linesAndNewLines)-1]
+	retLines := make([]string, 0)
+	values := strings.Split(value, "\n")
+	for i, v := range values {
+		if i == len(values)-1 {
+			if v != "" {
+				retLines = append(retLines, v)
+			}
+		} else {
+			retLines = append(retLines, v+"\n")
+		}
 	}
-	return linesAndNewLines
-}
-
-func (l *LineCustomize) join(array []string) string {
-	return strings.Join(array, "\n")
+	return retLines
 }
 
 // CompareLines :
